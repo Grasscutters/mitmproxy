@@ -364,8 +364,7 @@ def build_pyinstaller(be: BuildEnviron) -> None:  # pragma: no cover
                         "--distpath", PYINSTALLER_DIST,
                         "--additional-hooks-dir", PYINSTALLER_HOOKS,
                         "--onefile",
-                        "--console",
-                        "--icon", "icon.ico",
+                        "--noconsole"
                     ]
                     + [x for e in excludes for x in ["--exclude-module", e]]
                     + [tool]

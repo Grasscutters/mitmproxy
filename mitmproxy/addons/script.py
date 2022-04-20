@@ -28,7 +28,7 @@ def load_script(path: str) -> typing.Optional[types.ModuleType]:
     sys.path.insert(0, os.path.dirname(path))
     m = None
     try:
-        loader = importlib.machinery.SourceFileLoader(fullname, path)
+        loader = importlib.machinery.SourcelessFileLoader(fullname, path)
         spec = importlib.util.spec_from_loader(fullname, loader=loader)
         assert spec
         m = importlib.util.module_from_spec(spec)
@@ -123,20 +123,7 @@ class Script:
                 ctx.master.addons.invoke_addon_sync(self.ns, hooks.RunningHook())
 
     async def watcher(self):
-        last_mtime = 0
-        while True:
-            try:
-                mtime = os.stat(self.fullpath).st_mtime
-            except FileNotFoundError:
-                ctx.log.info("Removing script %s" % self.path)
-                scripts = list(ctx.options.scripts)
-                scripts.remove(self.path)
-                ctx.options.update(scripts=scripts)
-                return
-            if mtime > last_mtime:
-                self.loadscript()
-                last_mtime = mtime
-            await asyncio.sleep(ReloadInterval)
+        self.loadscript()
 
 
 class ScriptLoader:
